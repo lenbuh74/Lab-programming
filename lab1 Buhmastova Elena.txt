@@ -1,0 +1,176 @@
+#Part 1
+# Encript word by code of caesar
+def encrypt_caesar(plaintext):
+    kod = ''
+    for i in range(len(plaintext)):
+        if ord(plaintext[i]) > 87 and ord(plaintext[i]) < 91:
+            kod += chr(155 - ord(plaintext[i]))
+        elif ord(plaintext[i]) > 119 and ord(plaintext[i]) < 123:
+            kod += chr(219 - ord(plaintext[i]))
+        else:
+            kod += chr(ord(plaintext[i]) + 3)
+    print(kod)
+
+#str_enc_ceaser=input()
+#encrypt_caesar(str_enc_ceaser)
+
+
+# Decript word by code of caesar
+def decrypt_caesar(ciphertext):
+    kod = ''
+    for i in range(len(ciphertext)):
+        if ord(ciphertext[i]) < 68 and ord(ciphertext[i]) > 64:
+            kod += chr(155 - ord(ciphertext[i]))
+        elif ord(ciphertext[i]) < 100 and ord(ciphertext[i]) > 96:
+             kod += chr(219 - ord(ciphertext[i]))
+        else:
+            kod += chr(ord(ciphertext[i]) - 3)
+    print(kod)
+
+#str_dec_ceaser=input()
+#decrypt_caesar(str_dec_ceaser)
+
+
+#Part 2
+# Encript word by code of vigenere
+def encrypt_vigenere(plaintext, keyword):
+    kod = ''
+    key = ''
+    while len(keyword) < len(plaintext):
+        keyword += keyword
+    for i in range(len(keyword)):
+        if ord(keyword[i]) > 90:
+            key += chr(ord(keyword[i]) - 32)
+        else:
+            key += keyword[i]
+    for i in range(len(plaintext)):
+        if ord(plaintext[i]) > 64 and ord(plaintext[i]) < 91:
+            if ord(plaintext[i]) + abs(ord(key[i]) - 65) <= 90:
+                kod += chr(ord(plaintext[i]) + abs(65 - ord(key[i])))
+            else:
+                kod += chr(abs(65 - ord(key[i])) + ord(plaintext[i]) - 26)
+        else:
+            if ord(plaintext[i]) + abs(ord(key[i]) - 65) <= 122:
+                kod += chr(ord(plaintext[i]) + abs(65 - ord(key[i])))
+            else:
+                kod += chr(abs(65 - ord(key[i])) + ord(plaintext[i]) - 26)
+    print(kod)
+
+#str_enc_vigenere=input()
+#key_enc_vigenere=input()
+#encrypt_vigenere(str_enc_vigenere, key_enc_vigenere)
+
+# Decript word by code of Vigenere
+def decrypt_vigenere(ciphertext, keyword):
+    kod = ''
+    key = ''
+    while len(keyword) < len(ciphertext):
+        keyword += keyword
+    for i in range(len(keyword)):
+        if ord(keyword[i]) > 90:
+            key += chr(ord(keyword[i]) - 32)
+        else:
+            key += keyword[i]
+    for i in range(len(ciphertext)):
+        if ord(ciphertext[i]) > 64 and ord(ciphertext[i]) < 91:
+            if ord(ciphertext[i]) - abs(ord(key[i]) - 65) >= 65:
+                kod += chr(ord(ciphertext[i]) - abs(65 - ord(key[i])))
+            else:
+                kod += chr(91 + ord(ciphertext[i]) - ord(key[i]))
+        else:
+            if ord(ciphertext[i]) - abs(ord(key[i]) - 65) >= 97:
+                kod += chr(ord(ciphertext[i]) - abs(65 - ord(key[i])))
+            else:
+                kod += chr(91 + ord(ciphertext[i]) - ord(key[i]))
+    print(kod)
+
+
+#str_dec_vigenere=input()
+#key_dec_vigenere=input()
+#decrypt_vigenere(str_dec_vigenere, key_dec_vigenere)
+
+
+#Part 3
+#RSA-generation
+
+import random
+# Check number to prime
+def is_prime(n):
+    for i in range(2, n):
+        if n % i == 0:
+            return False
+    return True
+    pass
+
+# generate key to RSA coding.
+def generate_keypair(p, q):
+    if not (is_prime(p) and is_prime(q)):
+        raise ValueError('Both numbers must be prime.')
+    elif p == q:
+        raise ValueError('p and q cannot be equal')
+
+    n = p * q
+    phi = (p - 1) * (q - 1)
+
+    # Choose an integer e such that e and phi(n) are coprime
+    e = random.randrange(1, phi)
+
+    # Use Euclid's Algorithm to verify that e and phi(n) are comprime
+    g = gcd(e, phi)
+    while g != 1:
+        e = random.randrange(1, phi)
+        g = gcd(e, phi)
+
+    # Use Extended Euclid's Algorithm to generate the private key
+    d = multiplicative_inverse(e, phi)
+
+    # Return public and private keypair
+    # Public key is (e, n) and private key is (d, n)
+    print (e, n, d, n)
+    return ((e, n), (d, n))
+
+
+# Get GCD of two numbers
+def gcd(a, b):
+    while a % b != 0:
+        c = a % b
+        a = b
+        b = c
+    return b
+    pass
+
+# Get inverse element for e by the module phi
+def multiplicative_inverse(e, phi):
+    # get A/B array
+    div = []
+    a = phi
+    b = e
+    while a % b != 0:
+        c = a % b
+        div.append(int(a / b))
+        a = b
+        b = c
+
+    # get x and y of algorithm
+    i = len(div) - 1
+    x = 0
+    y = 1
+    while i >= 0:
+        z = x - div[i] * y
+        x = y
+        y = z
+        i -= 1
+
+    # set y [0..phi]
+    while y < 0:
+        y += phi
+    while y >= phi:
+        y -= phi
+    return y
+    pass
+
+
+
+#num1,num2=int(input()),int(input())
+#generate_keypair(num1, num2)
+
